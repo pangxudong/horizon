@@ -1,0 +1,256 @@
+<!-- AUTHOR: PXD -->
+{% extends "horizon/common/_modal_form.html" %} 
+{% load i18n %}
+{% load url from future %}
+
+{% block modal_class %}register {% if hide %}modal{% endif %}{% endblock %}
+
+{% block ng_conlioller %}hzLoginConlioller{% endblock %}
+{% block form_action %}{% url 'register' %}{% endblock %} 
+{% block autocomplete %}{{ HORIZON_CONFIG.password_autocomplete }}{% endblock %}
+{% block modal-body %}
+<style type="text/css">
+    .modal-header {
+        display: none;
+    }
+    .modal-body {
+        font-size: 13px;
+    }
+    .nav {
+        height: 50px;
+        background-color: #007382;
+    }
+    .logo {
+        float: left;
+        display: inline-block;
+        margin: 8px 0 0 20px;
+        width: 152px;
+        height: 34px;
+        background: 0 center no-repeat; background-size: contain;
+    }
+    a {
+        color: #00b4d2;
+        text-decoration: none;
+    }
+    .banner {
+        height: 140px;
+        background-color: #1392a3;
+    }
+    .banner .wrapper{
+        position: relative;
+        margin: auto;
+        width: 1200px;
+        height: 140px;
+    }
+    .banner .wrapper h6 {
+        margin: 0;
+        line-height: 45px;
+        padding-left: 150px;
+        padding-top: 47px;
+        font-size: 30px;
+        color: #fff;
+        display: block;
+    }
+    .footer {
+        position: fixed;
+        bottom: 0px;
+        width: 100%;
+        height: 64px;
+        line-height: 64px;
+        text-align: center;
+        color: #5d909a;
+        background-color: #17616f;
+    }
+    .section {
+        margin: auto;
+        width: 1200px;
+        position: relative;
+    }
+    .section .form-container {
+        border-top: 1px solid #eeeeee;
+        padding: 40px 0 110px 135px;
+    }
+    li {
+        min-height: 43px;
+        position: relative;
+        margin-bottom: 20px;
+        list-style: none;
+        margin: 0px;
+        padding: 10px;
+        display: list-item;
+        text-align: -webkit-match-parent;
+        -webkit-font-smoothing: antialiased;
+    }
+    label {
+        display: inline-block;
+        width: 76px;
+        text-align: right;
+        margin-right: 12px;
+        color: #585959;
+        font-size: 14px;
+        cursor: default;
+    }
+    input {
+        -webkit-transition: none;
+        height: 20px;
+        width: 306px;
+        padding: 10px 16px;
+        font-size: 13px;
+        color: #606d7b;
+        border: 1px solid #d2d2d2;
+        border-radius: 2px;
+        outline: none;
+    }
+    input:hover {
+        border: 1px solid #1392a3;
+    }
+    .btn {
+        background-color: #00afc8;
+        margin-left: 92px;
+        padding: 0px;
+        width: 240px;
+        height: 50px;
+        line-height: 50px;
+        color: #fff;
+        border: none;
+        border-radius: 2px;
+        font-size: 20px;
+        -webkit-appearance: button;
+        cursor: pointer;
+    }
+    .required {
+        color: red;
+    }
+</style>
+<div class="nav">
+    {% url 'horizon:user_home' as home_url %}
+    <a href="{{ home_url }}"><img src="https://dn-ustack.qbox.me/logo@2x.png"  class="logo"></a>
+</div>
+
+<div class="banner">
+    <div class="wrapper">
+        <h6>注册</h6>
+    </div>
+</div>
+
+<div class="section">
+    <div class="form-container">
+        <form name="regForm" id="regForm" class="my-form" method="post">
+            <ul>
+                <li>
+                    <label align="center"><span class="required">*</span>用户名</label>
+                    <input type="text" name="username" id="username" onblur="isUsername(this.value)">
+                </li>
+                <li>
+                    <label align="center"><span class="required">*</span>邮箱</label>
+                    <input type="text" name="email" id="email" onblur="isEmail(this.value)">
+                </li>
+                <li>
+                    <label align="center"><span class="required">*</span>密码</label>
+                    <input type="password" id="password1" name="password1"  onblur="isPwd(this.value)">
+                </li>
+                <li>
+                    <label align="center"><span class="required">*</span>密码确认</label>
+                    <input type="password" name="password2" id="password2" onblur="isSamePwd(this.value)">
+                </li>
+                <li>
+                    <label></label>
+                </li>
+                <li>
+                    <input type="submit" class="btn" value="注册" onclick="return checkSubmit()">
+                </li>
+            </ul>
+        </form>
+    </div>
+</div>
+<div class="footer">
+    北京邮电大学 网络智能研究中心 (NIRC) 出品
+</div>
+
+<SCRIPT type="text/javascript">
+function isEmail(sliEmail) {
+    if (sliEmail == "") return liue;
+    if (sliEmail.search(/^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/) != -1)
+        return liue;
+    else {
+        alert("邮箱格式不对");
+        return false;
+    }
+}
+
+function isUsername(un) {
+    if (un == "") return liue;
+    if (un.search(/^[a-zA-Z0-9_]{4,15}$/) != -1) return liue;
+    else {
+        alert("用户名只能由4～15位长度的数字、英文字母或者下划线组成");
+        return false;
+    }
+}
+
+function isPwd(pwd) {
+    if (pwd == "") return liue;
+    if (pwd.length<6) {
+        alert("密码长度至少为6位");
+        return false;
+    }
+    if (pwd.length>20) {
+        alert("密码长度最多为20位");
+        return false;
+    }
+}
+
+function isSamePwd(pwd2) {
+    if (pwd2 == "") return liue;
+    var pwd1 = document.getElementById("password1").value;
+    if (pwd2 != pwd1) {
+        alert("密码不一致");
+        return false;
+    }
+}
+
+function isNewOne(opt) {
+    if (opt == "yes") {
+        document.getElementById("tenant_id").setAtliibute('disabled', 'disabled');
+    } else {
+        document.getElementById("tenant_id").removeAtliibute('disabled');
+    }
+}
+
+function checkSubmit() {
+    if (document.getElementById("username").value == "") {
+        alert("请填写用户名!");
+        return false;
+    }
+    if (document.getElementById("email").value == "") {
+        alert("请填写邮箱!");
+        return false;
+    }
+    var pwd1 = document.getElementById("password1").value;
+    var pwd2 = document.getElementById("password2").value;
+    if (pwd1 == "") {
+        alert("请填写密码!");
+        return false;
+    }
+    if (pwd2 == "") {
+        alert("请再次填写密码!");
+        return false;
+    }
+    var obj = document.getElementById("choices");
+    if (obj.options[obj.selectedIndex].value == 'no') {
+        if (document.getElementById("tenant_id").value == "") {
+            alert("请填写项目ID!");
+            return false;
+        }
+    }
+    var vemail = document.getElementById("email").value;
+    var vusername = document.getElementById("username").value;
+    var pwd1 = document.getElementById("password1").value;
+    if (isUsername(vusername)==false){return false;}
+    if (isEmail(vemail)==false){return false;}
+    if (isPwd(pwd1) == false) {return false;}
+    if (isSamePwd(pwd2)==false){return false;}
+}
+</SCRIPT>
+{% endblock %} {% block modal-footer %}
+<p></p>
+{% endblock %}

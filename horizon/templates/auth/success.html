@@ -1,0 +1,30 @@
+<!-- AUTHOR: PXD -->
+{% load url from future %}
+{% block modal-body %}
+<html lang="en" xml:lang="en">
+
+<head>
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}auth/auth.css">
+</head>
+
+<body>
+<div class="nav">
+    {% url 'horizon:user_home' as home_url %}
+    <a href="{{ home_url }}">
+        <img src="https://dn-ustack.qbox.me/logo@2x.png" class="logo"></a>
+</div>
+<div class="banner">
+    <div class="wrapper">
+        <h6>success! you can <a href="{% url 'login'%}">login now!</a></h6>
+    </div>
+</div>
+
+<div class="section"></div>
+<div class="footer">北京邮电大学 网络智能研究中心 (NIRC) 出品</div>
+{% endblock %} {% block modal-footer %}
+<p></p>
+{% endblock %}
+
+</body>
+
+</html>

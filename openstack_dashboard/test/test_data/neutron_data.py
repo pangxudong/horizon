@@ -21,7 +21,6 @@ from openstack_dashboard.api import lbaas
 from openstack_dashboard.api import neutron
 from openstack_dashboard.api import vpn
 from openstack_dashboard.test.test_data import utils
-from openstack_dashboard.usage import quotas as usage_quotas
 
 
 def data(TEST):
@@ -41,7 +40,6 @@ def data(TEST):
     TEST.members = utils.TestDataContainer()
     TEST.monitors = utils.TestDataContainer()
     TEST.neutron_quotas = utils.TestDataContainer()
-    TEST.neutron_quota_usages = utils.TestDataContainer()
     TEST.net_profiles = utils.TestDataContainer()
     TEST.policy_profiles = utils.TestDataContainer()
     TEST.network_profile_binding = utils.TestDataContainer()
@@ -654,18 +652,6 @@ def data(TEST):
                   }
     TEST.neutron_quotas.add(base.QuotaSet(quota_data))
 
-    # Quota Usages
-    quota_usage_data = {'networks': {'used': 0, 'quota': 5},
-                        'subnets': {'used': 0, 'quota': 5},
-                        'routers': {'used': 0, 'quota': 5},
-                        }
-    quota_usage = usage_quotas.QuotaUsage()
-    for k, v in quota_usage_data.items():
-        quota_usage.add_quota(base.Quota(k, v['quota']))
-        quota_usage.tally(k, v['used'])
-
-    TEST.neutron_quota_usages.add(quota_usage)
-
     # Extensions.
     extension_1 = {"name": "security-group",
                    "alias": "security-group",
@@ -984,6 +970,7 @@ def data(TEST):
                 'router_ids': [TEST.routers.first().id],
                 'description': 'firewall description',
                 'status': 'PENDING_CREATE',
+                'shared': True,
                 'admin_state_up': True}
     TEST.api_firewalls.add(fw1_dict)
 
@@ -1000,6 +987,7 @@ def data(TEST):
                 'name': '',
                 'description': '',
                 'status': 'PENDING_CREATE',
+                'shared': True,
                 'admin_state_up': True}
     TEST.api_firewalls.add(fw1_dict)
 

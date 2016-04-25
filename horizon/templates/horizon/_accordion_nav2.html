@@ -1,0 +1,92 @@
+{% load branding horizon i18n %} 
+{% load url from future %}
+
+<style type="text/css">
+    .board-name {
+        color:#4b646f;
+        background: #1a2226;
+    }
+    a{
+        color:#8aa4af;
+    }
+    a:hover, a:focus {
+        color: #fff;
+    }
+    td a {
+        color: #3c8dbc;
+    }
+    td a:hover {
+        color: #8aa4af;
+    }
+</style>
+
+
+<aside class="main-sidebar sidebar-large">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar2">
+        <!-- sidebar menu: : style can be found in sidebar.less -->
+        <ul class="sidebar-menu">
+            <!-- {% for dashboard, panel_info in components %}
+                {% if user|has_permissions:dashboard %}
+                    <li class="header" {% if current.slug == dashboard.slug %}{% endif %} >{{ dashboard.name }}</li>
+                    {% for heading, panels in panel_info.iteritems %}
+                        {% with panels|has_permissions_on_list:user as filtered_panels %}
+                            {% if filtered_panels %}
+                                {% if heading %}
+                                    <li>{{ heading }}</li>
+                                {% endif %}
+                                {% for panel in filtered_panels %}
+                                    <li><a href="{{ panel.get_absolute_url }}">{{ panel.name }}</a></li>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                    {% endfor %}
+                    <hr>
+                {% endif %}
+            {% endfor %} -->
+
+
+            {% for dashboard, panel_info in components %}
+            {% if user|has_permissions:dashboard %}
+            <div  class="board-name">
+                <li class="header">
+                    {{ dashboard.name }}
+                </li>
+            </div>
+            {% for heading, panels in panel_info.iteritems %}
+            {% with panels|has_permissions_on_list:user as filtered_panels %}
+            <li {% if current_panel_group == heading %} class="treeview active"{% endif %}> <!-- in case that "identity" has no panel group -->
+                {% if filtered_panels %}
+                    {% if heading %}
+                    <a href="#">
+                        {% if heading == "Compute" %}<i class="fa fa-binoculars"></i>
+                        {% elif heading == "Network" %}<i class="fa fa-slack"></i>
+                        {% elif heading == "Orchestration" %}<i class="fa fa-sliders"></i>
+                        {% elif heading == "System" %}<i class="fa fa-life-bouy"></i>
+                        {% elif heading == "Object Store" %}<i class="fa fa-database"></i>
+                        {% elif heading == "Auth" %}<i class="fa fa-users"></i>
+                        {% elif heading == "Data Processing" %}<i class="fa fa-cubes"></i>{% endif %}
+                        <span>{{ heading }}</span> <i class="fa fa-angle-left pull-right"></i>
+                    </a>
+                    {% endif %}
+                    <ul class="treeview-menu">
+                        {% for panel in filtered_panels %}
+                            <li class="thirdItem">
+                                <a href="{{ panel.get_absolute_url }}" {% if current.slug == dashboard.slug and current_panel == panel.slug%}class="active"{% endif %} tabindex="{{ forloop.counter }}" >
+                                    <i class="fa fa-circle-o"></i>{{ panel.name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </li>
+            {% endwith %}
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+            
+
+        </ul>
+    </section>
+    <!-- /.sidebar -->
+</aside>

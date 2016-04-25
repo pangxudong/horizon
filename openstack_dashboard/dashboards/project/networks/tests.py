@@ -29,7 +29,6 @@ from openstack_dashboard.dashboards.project.networks import workflows
 from openstack_dashboard.test import helpers as test
 from openstack_dashboard.usage import quotas
 
-
 INDEX_URL = reverse('horizon:project:networks:index')
 
 
@@ -126,7 +125,9 @@ class NetworkTests(test.TestCase):
     @test.create_stubs({api.neutron: ('network_list',),
                         quotas: ('tenant_quota_usages',)})
     def test_index_network_list_exception(self):
-        quota_data = self.neutron_quota_usages.first()
+        quota_data = self.quota_usages.first()
+        quota_data['networks']['available'] = 5
+        quota_data['subnets']['available'] = 5
         api.neutron.network_list(
             IsA(http.HttpRequest),
             tenant_id=self.tenant.id,
@@ -159,7 +160,8 @@ class NetworkTests(test.TestCase):
         self._test_network_detail(mac_learning=True)
 
     def _test_network_detail(self, mac_learning=False):
-        quota_data = self.neutron_quota_usages.first()
+        quota_data = self.quota_usages.first()
+        quota_data['subnets']['available'] = 5
         network_id = self.networks.first().id
         api.neutron.network_get(IsA(http.HttpRequest), network_id)\
             .AndReturn(self.networks.first())
@@ -233,7 +235,7 @@ class NetworkTests(test.TestCase):
 
     def _test_network_detail_subnet_exception(self, mac_learning=False):
         network_id = self.networks.first().id
-        quota_data = self.neutron_quota_usages.first()
+        quota_data = self.quota_usages.first()
         quota_data['networks']['available'] = 5
         quota_data['subnets']['available'] = 5
         api.neutron.network_get(IsA(http.HttpRequest), network_id).\
@@ -278,7 +280,7 @@ class NetworkTests(test.TestCase):
 
     def _test_network_detail_port_exception(self, mac_learning=False):
         network_id = self.networks.first().id
-        quota_data = self.neutron_quota_usages.first()
+        quota_data = self.quota_usages.first()
         quota_data['subnets']['available'] = 5
         api.neutron.network_get(IsA(http.HttpRequest), network_id).\
             AndReturn(self.networks.first())
@@ -1657,41 +1659,9 @@ class NetworkPortTests(test.TestCase):
 
 class NetworkViewTests(test.TestCase):
 
-    def _test_create_button_shown_when_quota_disabled(
-            self, expected_string):
-        # if quota_data doesnt contain a networks|subnets|routers key or
-        # these keys are empty dicts, its disabled
-        quota_data = self.neutron_quota_usages.first()
-
-        quota_data['networks'].pop('available')
-        quota_data['subnets'].pop('available')
-
-        api.neutron.network_list(
-            IsA(http.HttpRequest),
-            tenant_id=self.tenant.id,
-            shared=False).AndReturn(self.networks.list())
-        api.neutron.network_list(
-            IsA(http.HttpRequest),
-            shared=True).AndReturn([])
-        quotas.tenant_quota_usages(
-            IsA(http.HttpRequest)) \
-            .MultipleTimes().AndReturn(quota_data)
-
-        self.mox.ReplayAll()
-
-        res = self.client.get(INDEX_URL)
-        self.assertTemplateUsed(res, 'project/networks/index.html')
-
-        networks = res.context['networks_table'].data
-        self.assertItemsEqual(networks, self.networks.list())
-        self.assertContains(res, expected_string, True, html=True,
-                            msg_prefix="The enabled create button not shown")
-
     def _test_create_button_disabled_when_quota_exceeded(
             self, expected_string, network_quota=5, subnet_quota=5):
-
-        quota_data = self.neutron_quota_usages.first()
-
+        quota_data = self.quota_usages.first()
         quota_data['networks']['available'] = network_quota
         quota_data['subnets']['available'] = subnet_quota
 
@@ -1713,7 +1683,8 @@ class NetworkViewTests(test.TestCase):
 
         networks = res.context['networks_table'].data
         self.assertItemsEqual(networks, self.networks.list())
-        self.assertContains(res, expected_string, True, html=True,
+
+        self.assertContains(res, expected_string, html=True,
                             msg_prefix="The create button is not disabled")
 
     @test.create_stubs({api.neutron: ('network_list',),
@@ -1729,56 +1700,27 @@ class NetworkViewTests(test.TestCase):
             "id='networks__action_create'>" \
             "<span class='fa fa-plus'></span>%s</a>" \
             % (url, link_name, " ".join(classes), link_name)
+
         self._test_create_button_disabled_when_quota_exceeded(expected_string,
-                                                              network_quota=0
-                                                              )
+                                                              network_quota=0)
 
     @test.create_stubs({api.neutron: ('network_list',),
                         quotas: ('tenant_quota_usages',)})
     def test_subnet_create_button_disabled_when_quota_exceeded_index(self):
         network_id = self.networks.first().id
+
         create_link = networks_tables.CreateSubnet()
         url = reverse(create_link.get_link_url(), args=[network_id])
         classes = (list(create_link.get_default_classes())
                    + list(create_link.classes))
         link_name = "%s (%s)" % (unicode(create_link.verbose_name),
                                  "Quota exceeded")
-        expected_string = "<a href='%s' class='%s disabled' " \
-                          "id='networks__row_%s__action_subnet'>%s</a>" \
-                          % (url, " ".join(classes), network_id, link_name)
-        self._test_create_button_disabled_when_quota_exceeded(expected_string,
-                                                              subnet_quota=0
-                                                              )
-
-    @test.create_stubs({api.neutron: ('network_list',),
-                        quotas: ('tenant_quota_usages',)})
-    def test_network_create_button_shown_when_quota_disabled_index(self):
-        # if quota_data doesnt contain a networks["available"] key its disabled
-        create_link = networks_tables.CreateNetwork()
-        url = create_link.get_link_url()
-        classes = (list(create_link.get_default_classes())
-                   + list(create_link.classes))
-        link_name = "%s" % (unicode(create_link.verbose_name),)
-        expected_string = "<a href='%s' title='%s'  class='%s' "\
-            "id='networks__action_create'>" \
-            "<span class='fa fa-plus'></span>%s</a>" \
-            % (url, link_name, " ".join(classes), link_name)
-        self._test_create_button_shown_when_quota_disabled(expected_string)
-
-    @test.create_stubs({api.neutron: ('network_list',),
-                        quotas: ('tenant_quota_usages',)})
-    def test_subnet_create_button_shown_when_quota_disabled_index(self):
-        # if quota_data doesnt contain a subnets["available"] key, its disabled
-        network_id = self.networks.first().id
-        create_link = networks_tables.CreateSubnet()
-        url = reverse(create_link.get_link_url(), args=[network_id])
-        classes = (list(create_link.get_default_classes())
-                   + list(create_link.classes))
-        link_name = "%s" % (unicode(create_link.verbose_name),)
-        expected_string = "<a href='%s' class='%s' "\
+        expected_string = "<a href='%s' class='%s disabled' "\
             "id='networks__row_%s__action_subnet'>%s</a>" \
             % (url, " ".join(classes), network_id, link_name)
-        self._test_create_button_shown_when_quota_disabled(expected_string)
+
+        self._test_create_button_disabled_when_quota_exceeded(expected_string,
+                                                              subnet_quota=0)
 
     @test.create_stubs({api.neutron: ('network_get',
                                       'subnet_list',
@@ -1787,7 +1729,7 @@ class NetworkViewTests(test.TestCase):
                         quotas: ('tenant_quota_usages',)})
     def test_subnet_create_button_disabled_when_quota_exceeded_detail(self):
         network_id = self.networks.first().id
-        quota_data = self.neutron_quota_usages.first()
+        quota_data = self.quota_usages.first()
         quota_data['subnets']['available'] = 0
 
         api.neutron.network_get(

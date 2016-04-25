@@ -18,11 +18,17 @@ from django.utils.translation import ugettext_lazy as _
 import horizon
 
 
+class AuthPanels(horizon.PanelGroup):
+        slug = "identity"
+        name = _("Auth")
+        panels = ('domains', 'projects', 'users', 'groups', 'roles',)
+
+
 class Identity(horizon.Dashboard):
-    name = _("Identity")
-    slug = "identity"
-    default_panel = 'projects'
-    panels = ('domains', 'projects', 'users', 'groups', 'roles',)
+        name = _("Identity")
+        slug = "identity"
+        panels = (AuthPanels,)
+        default_panel = 'projects'
 
 
 horizon.register(Identity)

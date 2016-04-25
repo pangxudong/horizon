@@ -350,6 +350,7 @@ class FirewallTests(test.TestCase):
         form_data = {'name': firewall.name,
                      'description': firewall.description,
                      'firewall_policy_id': firewall.firewall_policy_id,
+                     'shared': firewall.shared,
                      'admin_state_up': firewall.admin_state_up
                      }
         if router_extension:
@@ -402,6 +403,7 @@ class FirewallTests(test.TestCase):
         form_data = {'name': firewall.name,
                      'description': firewall.description,
                      'firewall_policy_id': None,
+                     'shared': firewall.shared,
                      'admin_state_up': firewall.admin_state_up
                      }
         api.neutron.is_extension_supported(

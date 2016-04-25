@@ -1,0 +1,47 @@
+<!-- AUTHOR: PXD -->
+{% extends "horizon/common/_modal_form.html" %} 
+{% block form_action %}{% url 'reset' %}{% endblock %} 
+{% block modal-body %}
+<center>
+    <h1>重置密码</h1>
+    <hr>
+    <SCRIPT type="text/javascript">
+    function isEmail(strEmail) {
+        if (strEmail == "") return true;
+        if (strEmail.search(/^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/) != -1)
+            return true;
+        else {
+            alert("邮箱格式不对");
+            return false;
+        }
+    }
+
+    function checkSubmit() {
+        if (document.getElementById("email").value == "") {
+            alert("请填写邮箱!");
+            return false;
+        }
+		return isEmail(document.getElementById("email").value);
+    }
+    </SCRIPT>
+    <form name="regForm" id="regForm" method="post">
+        <table>
+            <tr>
+                <td align="center">邮箱*:</td>
+                <td>
+                    <input type="text" name="email" id="email" onblur="isEmail(this.value)">
+                </td>
+            </tr>
+            <tr>
+                <td align="center">{% url 'horizon:user_home' as home_url %}<a href="{{ home_url }}">返回 </a></td>
+                <td>
+                    <input type="submit" value="提交" onclick="return checkSubmit()">
+                </td>
+            </tr>
+        </table>
+    </form>
+</center>
+{% endblock %}
+{% block modal-footer %}
+<p></p>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% load i18n branding %}
+
+<!DOCTYPE html>
+<html lang="en" xml:lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    {% include "horizon/_custom_meta.html" %}
+    <title>{% trans "Register" %} - {% site_branding %}</title>
+    <style type="text/css">
+      body {
+          margin: 0;
+          width: 100%;
+          min-height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <div>
+        {% include 'auth/_register.html' %}
+      </div>
+    </div>
+  </body>
+</html>

@@ -639,10 +639,6 @@ form label {
     display: inline-block;
 }
 
-.login.modal .modal-dialog {
-  width: 390px;
-}
-
 .modal.fullscreen .modal-dialog {
   width: 90%;
   margin: auto;
@@ -1007,8 +1003,9 @@ tr.terminated {
 }
 
 #content_body {
-  padding-left: $sidebar-width + $content-body-padding;
+  padding-left: 10px;
   padding-right: $content-body-padding;
+  //padding-left: $sidebar-width + $content-body-padding;
 }
 
 .tab_wrapper {

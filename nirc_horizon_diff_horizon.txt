@@ -1,0 +1,13 @@
+_header2.html
+_sidebar.html
+horizon.py
+_variables.scss
+horizon.scss
+_accordion_nav2.html
+
+dash2/*(修改了AdminLTE.min.css和app.min.js，把"class=sidebar"改成了"class=sidebar2",区分与horizon自带的sidebar样式)，
+只要在base.html的body上加上class="hold-transition skin-blue sidebar-mini",就可以了
+
+
+horizon/auth/*.html
+openstack_auth/*

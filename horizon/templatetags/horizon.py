@@ -44,7 +44,7 @@ def has_permissions_on_list(components, user):
             in components if has_permissions(user, component)]
 
 
-@register.inclusion_tag('horizon/_accordion_nav.html', takes_context=True)
+@register.inclusion_tag('horizon/_accordion_nav2.html', takes_context=True)
 def horizon_nav(context):
     if 'request' not in context:
         return {}
